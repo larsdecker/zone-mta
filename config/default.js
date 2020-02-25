@@ -36,7 +36,10 @@ module.exports = {
         collection: 'zone-queue',
 
         // set to true if you do not want old data to be removed
-        disableGC: false
+        disableGC: false,
+
+        // default zone for any other mail not specified by zone
+        defaultZone: 'default'
     },
 
     // plugin files to load into ZoneMTA, relative to ./plugins folder
@@ -172,7 +175,11 @@ module.exports = {
             // Selector value in the dkim signature
             selector: 'test',
             // Key location
-            path: '/path/to/private/key.pem'
+            path: '/path/to/private/key.pem',
+            // Headers to sign instead of default one
+            headerFields: [],
+            // Adds additional header to sign beside to the default one
+            additionalHeaderFields: []
         }
     },
 
@@ -369,13 +376,22 @@ module.exports = {
             // For example, if you have 5 IP's listed and you open 5 parallel
             // connections against a domain then each of these seems to originate
             // from a different IP address (assuming you can locally bind to these addresses)
-            pool: 'default'
+            pool: 'default',
+
+            // Default connection cache settings
+            // Connections are cached per process.
+            // Connections are cached by 'Zone-Sending-IP' + 'To-Domain' + 'MX-Port'
+            connectionCache: {
+                ttl: 5,             // how long should a connection kept open. Given in seconds
+                reuseCount: 100,    // how often should a connection be reused
+            }
 
             // Use next MTA instead of actual MX
             /*
             host: 'smtp.ethereal.email',
             port: 587,
             auth: {
+
                 user: 'jzzluvyzi6hdb5r3@ethereal.email',
                 pass: 'k6XGxbJc5h4Ny7PgtN'
             }

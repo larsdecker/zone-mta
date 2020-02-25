@@ -19,6 +19,7 @@ const crypto = require('crypto');
 const QueueClient = require('../lib/transport/client');
 const queueClient = new QueueClient(config.queueServer);
 const RemoteQueue = require('../lib/remote-queue');
+const ConnectionPool = require('../lib/connection-pool');
 
 const senders = new Set();
 
@@ -69,6 +70,8 @@ let sendCommand = (cmd, callback) => {
     responseHandlers.set(id, callback);
     queueClient.send(data);
 };
+
+const connectionPool = new ConnectionPool(sendCommand);
 
 queueClient.connect(err => {
     if (err) {
@@ -128,7 +131,7 @@ queueClient.connect(err => {
             for (let i = 0; i < count; i++) {
                 // use artificial delay to lower the chance of races
                 setTimeout(() => {
-                    let sender = new Sender(clientId, ++zoneCounter, zone, sendCommand, queue);
+                    let sender = new Sender(clientId, ++zoneCounter, zone, sendCommand, queue, connectionPool);
                     senders.add(sender);
                     sender.once('error', err => {
                         log.info(logName, 'Sender error. %s', err.message);
