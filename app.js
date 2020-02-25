@@ -19,6 +19,8 @@ log.level = config.log.level;
 process.execArgv = [];
 
 const promClient = require('prom-client'); // eslint-disable-line no-unused-vars
+const Gauge = promClient.Gauge;
+
 
 const SMTPProxy = require('./lib/receiver/smtp-proxy');
 const APIServer = require('./lib/api-server');
@@ -37,7 +39,20 @@ const apiServer = new APIServer();
 const queueServer = new QueueServer();
 const queue = new MailQueue(config.queue);
 
-promClient.collectDefaultMetrics({ timeout: 5000 });
+promClient.collectDefaultMetrics({ timeout: 5000});
+
+
+const nodeHostName = new Gauge({
+    name: 'hostname',
+    help: 'Hostname Info',
+    labelNames: ['hostname'],
+    aggregator: 'first'
+});
+nodeHostName
+    .labels(config.queue.instanceId)
+    .set(1);
+
+
 
 config.on('reload', () => {
     queue.cache.flush();
