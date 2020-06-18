@@ -1,5 +1,15 @@
 # CHANGELOG
 
+-   v2.2.0 2020-05-27
+
+    -   Updated garbage collection to delete orphaned message chunks by \_id
+    -   Added new option queue.maxQueueTime (default 30 days) to delete unprocessed entries from queue
+
+-   v2.1.0 2020-05-27
+
+    -   Added bunch of new bounce responses
+    -   There is now a connection pool (since 2.0.0)
+
 -   v1.17.0 2019-06-14
 
     -   Fixed O365 bounce msg. (jpbede)
